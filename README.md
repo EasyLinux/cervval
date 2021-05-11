@@ -10,6 +10,9 @@ L'image choisie est une image `CentOS Linux release 8.3`
 
 # Terraform
 
+[Documentation](Documentation/Terraform.md)
+
+
 Commencer par copier le fichier `credentials.sample` en `.credentials`, puis `terraform.tfvars.sample` en `terraform.tfvars`      
 
 * Le fichier `.credentials` contient le compte et mot de passe pour l'accès à **PowerVC**
@@ -77,7 +80,7 @@ mount -a
 
 ### Prise en compte de l'IP
 
-Cliud-init présente un **bug** en CentOS 8, l'adresse ip est ré-initialisée au reboot, pour l'éviter, créer le fichier 10_network.cfg suivant :
+Cloud-init présente un **bug** en CentOS 8, l'adresse ip est ré-initialisée au reboot, pour l'éviter, créer le fichier 10_network.cfg suivant :
 
 ```yaml
 # dans /etc/cloud/cloud.cfg.d
