@@ -5,7 +5,10 @@ Mise en oeuvre de terraform
 Terraform est un logiciel de déploiement d'architecteure as code (iaac). [Terraform](https://www.terraform.io/) 
 
 Losrque vous lancez terraform, il analyse les fichiers présents dans l'arborescence avec l'extension `.tf`  
+
 Il est possible de positionner des variables via un fichier terraform.tfvars ou auto.var.tfvars
+
+> **NB**: Toutes les actions de terraform sont lues en 'ligne' (un bloc), toutefois, il est préférable de séparer les actions dans différents fichiers. Au sens Terraform, tout fichier .tf ou .tfvars est inclu pour constituer l'ensemble des actions à mener.
 
 ## Implémentation 
 
@@ -59,13 +62,13 @@ provider "random" {
 ```  
  > **NB**: les références var.<xxx> font référence à une variable (voir plus bas)
 
-## variable.tf
+## variables.tf
 
-Le fichier **variables.tf** définit les variables qui seront utilisées dans le déploiement
+Le fichier **variables.tf** définit les variables qui seront utilisées dans le déploiement. 
 
- > **NB**: Le contenu des variables est défini dans un fichier `terraform.tfvars` ce fichier est séparé de la définition 
+> **NB**: Leur instanciation est faite dans le fichier `terraform.tfvars` 
 
- Fichier **variables.tf**
+Fichier **variables.tf**
 
  ```terraform
  ################################################################
@@ -203,3 +206,96 @@ variable "vol_size" {
   default     = 0
 }
 ```
+
+## terraform.tfvars
+
+Ce fichier est utilisé pour définir la valeur des variables
+
+```terraform
+##################################################
+# Définition de la connexion OpenStack (PowerVC) # 
+##################################################
+
+# OpenStack Provider URL
+auth_url = "<url>"
+
+# Project
+tenant_name = "<Project>"
+domain_name = "Default"
+
+# PowerVC user: pour des raisons de sécurité, les credentials sont passés en variables d'environnement
+# export TF_VAR_os_name=
+# export TF_VAR_os_password=
+# os_name =""
+# os_password = ""
+
+# Host Group
+openstack_availability_zone = "<host group>"
+
+# Storage Connectivity Groups to isolate prod/dev/... :
+scg_id = "<storage id>"
+
+# Network
+network_name = "<network name>"
+network_type = "SEA"
+
+# Generated key files on your Terraform project data folder
+public_key_file  = "data/id_rsa.pub"
+private_key_file = "data/id_rsa"
+repo_file        = "data/centos.repo"
+
+# VM access
+user_name     = "<vm_user>"
+user_password = "<vm_user_password>"
+
+# Compute Template type and Image ID 
+vm = {
+  instance_type = "<instance_type>",
+  image_id      = "<image_id>"
+}
+
+vm_name = "<vm_name>"
+vm_ip   = "<vm_ip>"
+
+vol_name = "<volume_name>"
+vol_size = <size_mb>
+``` 
+ 
+## main.tf
+
+Ce fichier décrit les actions qui seront effectuées par Terraform
+
+```terraform
+# Choix de la version de Terraform
+terraform {
+  required_version = ">= 0.12.0, < 0.13.0"
+  required_providers {
+    openstack = {
+      version = "1.29.0"
+    }
+    random = {
+      version = "2.3.0"
+    }
+  }
+}
+
+# Création de la machine
+module "vm" {
+  source                      = "./modules/1_base"
+  vm                          = var.vm
+  vm_name                     = var.vm_name
+  vm_ip                       = var.vm_ip
+  user_name                   = var.user_name
+  user_password               = var.user_password
+  network_name                = var.network_name
+  scg_id                      = var.scg_id
+  openstack_availability_zone = var.openstack_availability_zone
+  vm_username                 = var.user_name
+  vm_userpassword             = var.user_password
+  vol_name                    = var.vol_name
+  vol_size                    = var.vol_size
+}
+```  
+
+> Ici la tâche principale est de passer les paramètres au 'module' et de l'appeler. 
+Tout se passe dans le module 1_base.
