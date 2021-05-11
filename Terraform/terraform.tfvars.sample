@@ -1,0 +1,49 @@
+##################################################
+# Définition de la connexion OpenStack (PowerVC) # 
+##################################################
+
+# OpenStack Provider URL
+auth_url = ""
+
+# Project
+tenant_name = ""
+domain_name = "Default"
+
+# PowerVC user: to keep safe, define PowerVC user name and password externally
+# export TF_VAR_os_name=
+# export TF_VAR_os_password=
+# os_name =""
+# os_password = ""
+
+# Host Group
+openstack_availability_zone = ""
+
+# Storage Connectivity Groups to isolate prod/dev/... :
+scg_id = ""
+
+# Network
+network_name = ""
+network_type = "SEA"
+
+# Generated key files on your Terraform project data folder (ssh-keygen)
+public_key_file  = "data/id_rsa.pub"
+private_key_file = "data/id_rsa"
+repo_file        = "data/centos.repo"
+
+# VM access
+user_name     = ""
+user_password = ""
+
+# VM ansible user
+ansible_user_name     = ""
+ansible_user_password = ""
+
+# Compute Template type and Image ID 
+awx = {
+  instance_type = "",
+  image_id      = ""
+}
+
+vm_name = ""
+vm_ip   = ""
+
