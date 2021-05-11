@@ -56,3 +56,40 @@ Accès à la vm
 * **vol_name** Nom du volume 
 * **vol_size** Taille du volume en méga (ex: 1500)
 
+## Actions manuelles
+
+> **NB**: actuellement la machine n'est pas visible depuis le réseau où se trouve terraform, il faut réaliser des étapes manuelles pour finaliser l'installation
+
+### Ajout du disque 
+
+Lancer les commandes suivantes
+
+```bash 
+pvcreate /dev/mapper/mpathc
+vgcreate vg_data /dev/mapper/mpathc
+lvcreate -l 100%FREE -n lv_data vg_data
+mkfs.xfs /dev/mapper/vg_data-lv_data
+mkdir /lv_data
+echo "/dev/mapper/vg_data-lv_data     /data           xfs     defaults        0 0" >> /etc/fstab
+systemctl daemon-reload
+mount -a
+```
+
+### Prise en compte de l'IP
+
+Cliud-init présente un **bug** en CentOS 8, l'adresse ip est ré-initialisée au reboot, pour l'éviter, créer le fichier 10_network.cfg suivant :
+
+```yaml
+# dans /etc/cloud/cloud.cfg.d
+
+network:
+  version: 2
+  ethernets:
+    env32:
+      dhcp4: false
+      dhcp6: false
+      addresses: [172.25.153.209/28]
+      gateway4: 172.25.153.214
+      nameservers:
+        addresses: [8.8.8.8]
+```  
