@@ -353,11 +353,13 @@ variable "vm_userpassword" {}
 Ce fichier définit les actions de base à réaliser
 
 ```terraform
+# Création du disque dur data 
 resource "openstack_blockstorage_volume_v2" "vol" {
   name = var.vol_name
   size = var.vol_size
 }
 
+# création de la machine 
 resource "openstack_compute_instance_v2" "vm" {
   name      = var.vm_name
   image_id  = var.vm.image_id
@@ -375,9 +377,9 @@ resource "openstack_compute_volume_attach_v2" "attached" {
   volume_id   = openstack_blockstorage_volume_v2.vol.id
 } 
 
-# To check vm availability before running commands (provisioners) 
+# Valider le bon fonctionnement 
 resource "null_resource" "check_vm" {
-  # Connect to the vm as root in order to run the script with right privilege
+  # Connexion SSH à la machine
   connection {
     type     = "ssh"
     host     = openstack_compute_instance_v2.vm.access_ip_v4
@@ -392,6 +394,21 @@ resource "null_resource" "check_vm" {
     ]
   }
 
+  # Ajout du disque sur /data 
+  provisioner "remote-exec" {
+    inline = [
+      "pvcreate /dev/mapper/mpathc",
+      "vgcreate vg_data /dev/mapper/mpathc",
+      "lvcreate -l 100%FREE -n lv_data vg_data",
+      "mkfs.xfs /dev/mapper/vg_data-lv_data",
+      "mkdir /lv_data",
+      "echo '/dev/mapper/vg_data-lv_data     /data           xfs     defaults        0 0' >> /etc/fstab",
+      "systemctl daemon-reload",
+      "mount -a"
+    ]
+  }
+ 
+
 }
 ```
- 
+
