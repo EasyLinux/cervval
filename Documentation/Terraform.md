@@ -2,7 +2,7 @@
 
 Mise en oeuvre de terraform 
 
-Terraform est un logiciel de déploiement d'architecteure as code (iaac). [Terraform](https://www.terraform.io/) 
+Terraform est un logiciel de déploiement d'architecture as code (iaac). [Terraform](https://www.terraform.io/) 
 
 Losrque vous lancez terraform, il analyse les fichiers présents dans l'arborescence avec l'extension `.tf`  
 
@@ -299,3 +299,99 @@ module "vm" {
 
 > Ici la tâche principale est de passer les paramètres au 'module' et de l'appeler. 
 Tout se passe dans le module 1_base.
+
+# Déploiement
+
+Le répertoire modules/1_base contient la routine d'installation proprement dite.
+
+Elle est constituées de plusieurs fichiers :
+
+1. **variables.tf**  Définit les vairables utilisées par le module
+2. **base.tf**   est le code de déploiement
+3. **output.tf** spécifie les variables en sortie
+
+# variables.tf
+
+Ce fichier permet de déclarer les variables qui seront utilisées
+
+```terraform
+variable "vm_id" {
+  default = ""
+}
+variable "vm" {
+  default = {
+    instance_type = ""
+    image_id      = ""
+    name          = ""
+  }
+}
+
+# Disk
+variable "vol_name"{}
+variable "vol_size"{}
+
+variable "vm_name"{} 
+variable "vm_ip"{} 
+variable "user_name"{} 
+variable "user_password"{} 
+# variable "repo_file"{} 
+variable "network_name" {}
+variable "scg_id" {}
+variable "openstack_availability_zone" {}
+variable "vm_username" {}
+variable "vm_userpassword" {}
+
+#openstack connexion
+# variable "private_key" {}
+# variable "public_key" {}
+# variable "create_keypair" {}
+# variable "keypair_name" {}
+```
+
+# base.tf
+
+Ce fichier définit les actions de base à réaliser
+
+```terraform
+resource "openstack_blockstorage_volume_v2" "vol" {
+  name = var.vol_name
+  size = var.vol_size
+}
+
+resource "openstack_compute_instance_v2" "vm" {
+  name      = var.vm_name
+  image_id  = var.vm.image_id
+  flavor_id = var.vm.instance_type
+  network {
+    name        = var.network_name
+    fixed_ip_v4 = var.vm_ip
+  }
+  availability_zone = var.openstack_availability_zone
+}
+
+# Attacher le volume cree a la vm
+resource "openstack_compute_volume_attach_v2" "attached" {
+  instance_id = openstack_compute_instance_v2.vm.id
+  volume_id   = openstack_blockstorage_volume_v2.vol.id
+} 
+
+# To check vm availability before running commands (provisioners) 
+resource "null_resource" "check_vm" {
+  # Connect to the vm as root in order to run the script with right privilege
+  connection {
+    type     = "ssh"
+    host     = openstack_compute_instance_v2.vm.access_ip_v4
+    user     = var.user_name
+    password = var.user_password
+    timeout  = "1h"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "whoami"
+    ]
+  }
+
+}
+```
+ 
