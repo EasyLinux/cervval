@@ -32,9 +32,11 @@ Organisation des fichiers
 └── variables.tf                   # Définition des variables 
 ``` 
 
+## provider.tf
+
 Avant de travailler avec terraform, il faut définir un provider. C'est un ou plusieurs plugin. Dans notre cas (Powervc), nous allons utiliser `Openstack` c'est le système utilisé par Powervc.
 
-Le fichier provider.tf :
+Le fichier **provider.tf** :
 
 ```terraform
 # Définir le provider à utiliser
@@ -57,11 +59,13 @@ provider "random" {
 ```  
  > **NB**: les références var.<xxx> font référence à une variable (voir plus bas)
 
- Le fichier variables.tf définit les variables qui seront utilisées dans le déploiement
+## variable.tf
+
+Le fichier **variables.tf** définit les variables qui seront utilisées dans le déploiement
 
  > **NB**: Le contenu des variables est défini dans un fichier `terraform.tfvars` ce fichier est séparé de la définition 
 
- Fichier variables.tf
+ Fichier **variables.tf**
 
  ```terraform
  ################################################################
@@ -199,4 +203,3 @@ variable "vol_size" {
   default     = 0
 }
 ```
-    
