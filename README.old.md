@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Ce projet contient tout ce qui est nécessaire pour installer une machine de base à partir d'une image **Unbuntu** sur architecture **Power**
+Ce projet contient tout ce qui est nécessaire pour installer une machine de base à partir d'une image CentOS 8 sur architecture **Power**
 
 ## Image
 
