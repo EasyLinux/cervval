@@ -47,10 +47,10 @@ Les points de montage du template ne sont plus accessibles lorsque la vm a déma
 # that works even if disks are added and removed. See fstab(5).
 #
 # <file system> <mount point>   <type>  <options>       <dump>  <pass>
-/dev/mapper/ubuntu--vg-ubuntu--lg / 		ext4 defaults 0 0
-/dev/mapper/mpathb-part2 					/boot ext4 defaults 0 0
-/swap.img       									none	swap sw     	0 0
-/dev/mapper/vg_data-lv_data 			/data xfs  defaults 0 0
+/dev/mapper/ubuntu--vg-ubuntu--lg     /      ext4   defaults     0     0
+/dev/mapper/mpathb-part2              /boot  ext4   defaults     0     0
+/swap.img                             none	 swap   sw           0     0
+/dev/mapper/vg_data-lv_data           /data  xfs    defaults     0     0
 ```
 
 Relancer la machine, puis mettre à jour Ubuntu :
